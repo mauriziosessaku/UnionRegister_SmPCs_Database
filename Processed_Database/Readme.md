@@ -293,7 +293,7 @@ This database will be updated periodically to include:
 ## 📧 Contact & Support
 
 For questions, issues, or collaboration:
-- **Email**: gqn375@alumni.ku.dk
+- **Email**: maurizio.sessa@sund.ku.dk
 - **Author**: Syed Tauhid Bukhari
 - **Supervisor**: Maurizio Sessa
 - **Institution**: University of Copenhagen
