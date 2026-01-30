@@ -6,14 +6,6 @@ A comprehensive system for extracting and analyzing adverse events from European
 
 This project addresses a critical gap in pharmacovigilance research by developing the first comprehensive, dynamic reference dataset based on historical SmPC documents for all centrally authorized products in the European Union. The dataset enables temporal tracking of adverse event emergence and supports the evaluation of both traditional statistical methods and AI-based approaches for safety signal detection.
 
-### Key Statistics
-- **1,514** centrally authorized medicinal products analyzed
-- **123,944** total adverse events extracted
-- **17,064** unique adverse events identified
-- **16,594** SmPC updates processed (spanning 1995-2025)
-- **92%** LLM extraction accuracy
-- **33%** of AEs identified post-marketing
-
 ## 🎯 Motivation
 
 Current pharmacovigilance faces significant challenges:
