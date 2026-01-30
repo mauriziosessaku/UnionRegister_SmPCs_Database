@@ -67,7 +67,7 @@ This project is licensed under [LICENSE TYPE] - see LICENSE file for details.
 If you use this dataset or methodology in your research, please cite:
 ```bibtex
 @misc{bukhari2026dynamic,
-  author = {Bukhari, Syed Tauhid; Kefala, Mary; Sessa, Maurizo},
+  author = {Bukhari, Syed Tauhid; Kefala, Mary; Sessa, Maurizio},
   title = {Making a Dynamic Reference Set for Assessing Performance of Traditional and 
            Artificial Intelligence-based Methods for Signal Detection in Pharmacovigilance},
   year = {2026},
