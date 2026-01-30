@@ -31,8 +31,6 @@ Current pharmacovigilance faces significant challenges:
 - Quality validation with 92% accuracy
 
 ### Part 2: Dynamic Reference Database
-- SQL-based relational database with CRUD functionality
-- Web-based interface (SmPC Database Viewer)
 - MedDRA terminology mapping
 - ATC code integration
 - Temporal tracking of AE emergence
@@ -44,32 +42,10 @@ Current pharmacovigilance faces significant challenges:
 - Therapeutic area correlation analysis
 - Individual drug safety profiles
 
-## 🏗️ System Architecture
-```
-SmPC Database
-├── Dashboard (Visual Analytics)
-├── Human Gold Standard (Validated AE Records)
-├── SmPCs (Product Characteristics)
-├── SmPCs Updates (Historical Versions)
-└── Export Data (Filtered Exports)
-```
-
-### Database Tables
-
-**SmPCs Table**
-- Drug name, EMA links, SmPC text, Closed date
-
-**SmPCs Updates Table**
-- Drug name, INN, Type, Decision date, MAH, ATC codes, Indication, EMA number
-
-**Human Gold Standard Table**
-- Drug-AE pairs, Assessment status, Regulatory metadata, MedDRA coding
-
 ## 💻 Technical Stack
 
 - **Language**: Python 3.12
 - **Platform**: Google Colab
-- **Database**: MySQL with MyAdmin interface
 - **LLM**: DeepSeek AI for text extraction
 - **Key Libraries**: 
   - pandas (data handling)
@@ -79,59 +55,8 @@ SmPC Database
 
 ## 📊 Data Sources
 
-1. **European Commission Union Register** - Historical SmPC documents
-2. **EudraVigilance** - EU adverse reaction database
-3. **PRAC Signal List** - Validated safety signals (2012-2025)
-4. **MedDRA** - Medical terminology standardization
-5. **WHO-DD** - Drug dictionary
-
-## 🔧 Installation & Setup
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/smpc-reference-database.git
-
-# Install required packages
-pip install pandas openpyxl PyPDF2 pymysql requests --break-system-packages
-
-# Configure database connection
-# Update credentials in config file
-```
-
-## 📖 Usage
-
-### Extracting SmPC Data
-```python
-# Run extraction script for latest SmPCs
-python extract_latest_smpcs.py
-
-# Run extraction for historical updates
-python extract_updates.py --drug_url [PRODUCT_URL] --date [OPTIONAL_DATE]
-```
-
-### Accessing the Database
-
-1. Navigate to SmPC Database Viewer interface
-2. Select module (Dashboard, SmPCs, Updates, etc.)
-3. Filter and export data as needed
-
-### Generating Reports
-```python
-# Create drug safety surveillance report
-python generate_report.py --drug_name "Abasaglar"
-
-# Analyze time-to-detection by SOC
-python analyze_ttd.py --soc "Cardiac disorders"
-```
-
-## 📈 Key Findings
-
-- **Mean time to detection**: 6.02 years
-- **Median time to detection**: 4.67 years
-- **Clinical trial detection**: 67% of all AEs
-- **Post-marketing detection**: 33% of all AEs
-- Notable delays for:
-  - Ophthalmic complications (~5-6 years)
-  - Hypersensitivity reactions (~5-6 years)
+1. **European Commission Union Register** - Historical SmPC documents up to 15/12/2025
+2. **MedDRA v21** - Medical terminology standardization
 
 ## 🗂️ File Structure
 ```
@@ -169,7 +94,7 @@ This project is licensed under [LICENSE TYPE] - see LICENSE file for details.
 If you use this dataset or methodology in your research, please cite:
 ```bibtex
 @misc{bukhari2026dynamic,
-  author = {Bukhari, Syed Tauhid},
+  author = {Bukhari, Syed Tauhid; Kefala, Mary; Sessa, Maurizo},
   title = {Making a Dynamic Reference Set for Assessing Performance of Traditional and 
            Artificial Intelligence-based Methods for Signal Detection in Pharmacovigilance},
   year = {2026},
@@ -187,8 +112,8 @@ If you use this dataset or methodology in your research, please cite:
 ## 📧 Contact
 
 For questions or collaboration inquiries, please contact:
-- Email: gqn375@alumni.ku.dk
-- Project Lead: Syed Tauhid Bukhari
+- Email: maurizio.sessa.ku.dk
+- Project Lead: Maurizio Sessa
 
 ## ⚠️ Disclaimer
 
