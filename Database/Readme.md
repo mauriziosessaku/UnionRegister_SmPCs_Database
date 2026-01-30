@@ -31,6 +31,5 @@ data/
 ```bash
 # Using GitHub CLI
 gh release download v1.0.0 --pattern "Database.zip"
-# Using curl
-curl -L -O https://github.com/yourusername/repo-name/releases/download/v1.0.0/smpc-database.zip
+
 ```
