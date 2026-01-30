@@ -1,7 +1,13 @@
 # EMA SmPC Adverse Event Extraction Pipeline
 
 
-[![Watch the Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://app.heygen.com/share/0779e595a67541d7b20db85130f92bf2)
+<details>
+  <summary>▶ Click to watch the Video Tutorial</summary>
+  <br>
+  <a href="https://app.heygen.com/share/0779e595a67541d7b20db85130f92bf2" target="_blank">
+    View the HeyGen SmPC Extraction Guide
+  </a>
+</details>
 
 **Quality Check and Processing Script**
 
