@@ -4,12 +4,12 @@ This directory should contain the extracted SmPC database files.
 
 ## Download Instructions
 
-1. Go to the [Releases page](https://github.com/yourusername/repo-name/releases)
-2. Download the latest `smpc-database.zip` file
+1. Go to the [Releases page](https://github.com/mauriziosessaku/UnionRegister_SmPCs_Database/releases)
+2. Download the latest `Database.zip` file
 3. Extract it into this directory
 ```bash
 # Extract the downloaded file here
-unzip smpc-database.zip -d .
+unzip Database.zip -d .
 ```
 
 ## Expected Structure
@@ -30,11 +30,7 @@ data/
 ## Alternative: Direct Download via Command Line
 ```bash
 # Using GitHub CLI
-gh release download v1.0.0 --pattern "smpc-database.zip"
-
-# Using wget
-wget https://github.com/yourusername/repo-name/releases/download/v1.0.0/smpc-database.zip
-
+gh release download v1.0.0 --pattern "Database.zip"
 # Using curl
 curl -L -O https://github.com/yourusername/repo-name/releases/download/v1.0.0/smpc-database.zip
 ```
