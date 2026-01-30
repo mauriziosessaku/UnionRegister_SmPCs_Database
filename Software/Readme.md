@@ -1,5 +1,8 @@
 # EMA SmPC Adverse Event Extraction Pipeline
 
+
+<iframe width="560" height="315" src="https://app.heygen.com/embedded-player/0779e595a67541d7b20db85130f92bf2" title="HeyGen video player" frameborder="0" allow="encrypted-media; fullscreen;" allowfullscreen></iframe>
+
 **Quality Check and Processing Script**
 
 A comprehensive Google Colab pipeline for extracting, processing, and validating adverse events from European Medicines Agency (EMA) Summary of Product Characteristics (SmPC) documents.
