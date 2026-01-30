@@ -50,25 +50,6 @@ Current pharmacovigilance faces significant challenges:
 1. **European Commission Union Register** - Historical SmPC documents up to 15/12/2025
 2. **MedDRA v21** - Medical terminology standardization
 
-## 🗂️ File Structure
-```
-project/
-├── extract_latest_smpcs.py
-├── extract_updates.py
-├── database/
-│   ├── schema.sql
-│   └── config.py
-├── analysis/
-│   ├── generate_report.py
-│   ├── analyze_ttd.py
-│   └── visualization.py
-├── data/
-│   ├── [Drug folders with Latest/Updates subfolders]
-│   └── exports/
-└── docs/
-    └── methodology.md
-```
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please:
