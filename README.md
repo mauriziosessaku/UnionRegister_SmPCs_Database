@@ -1,99 +1,64 @@
-# Dynamic Reference Set for Pharmacovigilance Signal Detection
+# [cite_start]Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance [cite: 3]
 
-A comprehensive system for extracting and analyzing adverse events from European Medicines Agency (EMA) Summary of Product Characteristics (SmPC) documents to create a dynamic, time-indexed reference dataset for benchmarking signal detection methods in pharmacovigilance.
+[cite_start]A comprehensive system for extracting and analyzing adverse events from European Union Summary of Product Characteristics (SmPC) documents to create a dynamic, time-indexed reference dataset for benchmarking signal detection methods in pharmacovigilance[cite: 25, 36].
 
 ## 📋 Overview
 
-This project addresses a critical gap in pharmacovigilance research by developing the first comprehensive, dynamic reference dataset based on historical SmPC documents for all centrally authorized products in the European Union. The dataset enables temporal tracking of adverse event emergence and supports the evaluation of both traditional statistical methods and AI-based approaches for safety signal detection.
+[cite_start]This project addresses a critical gap in pharmacovigilance research by developing a time-indexed reference dataset for the European Union (EU)[cite: 25]. [cite_start]The database includes 17,761 SmPC versions spanning from 1995 to 2025, comprising 123,868 drug–adverse event (AE) associations[cite: 29]. [cite_start]The processed database for active centrally authorized products (CAPs) includes 1,479 medicinal products and 110,548 drug-event associations[cite: 30].
 
 ## 🎯 Motivation
 
-Current pharmacovigilance faces significant challenges:
-- ~95% false positive rate in EMA statistical signal detection (2024)
-- Average 2.5 years from signal detection to validation
-- Existing reference datasets (OMOP, SIDER) are static and limited in scope
-- No comprehensive EU-specific, time-indexed reference standards exist
+[cite_start]The identification of optimal signal detection methods is hindered by the lack of reliable reference datasets[cite: 23]. [cite_start]Existing datasets do not capture when adverse events (AEs) are officially recognized by regulatory authorities[cite: 24]. [cite_start]This limitation prevents the restriction of analyses to pre-confirmation periods and limits the evaluation of early detection performance[cite: 24]. 
 
-## 🚀 Features
+## 🚀 Methodology and Features
 
-### Part 1: Automated AE Extraction
-- Systematic extraction from all historical SmPC versions
-- LLM-based text mining (DeepSeek AI)
-- Automated PDF processing and Section 4.8 parsing
-- Quality validation with 92% accuracy
+[cite_start]The data processing workflow consists of sequential and fully automated stages[cite: 74]:
 
-### Part 2: Dynamic Reference Database
-- MedDRA terminology mapping
-- ATC code integration
-- Temporal tracking of AE emergence
+* [cite_start]**Generation of the Union Register Link List**: Standardized URLs are constructed for each product to point to dedicated Union Register pages[cite: 79].
+* [cite_start]**Web Scraping and Metadata Extraction**: Product information and regulatory procedure records are programmatically retrieved from EMA public HTML webpages[cite: 82].
+* [cite_start]**PDF Download and Section 4.8 Extraction**: SmPC PDFs are downloaded and the "Undesirable effects" section is extracted using `pdfplumber`[cite: 86, 87].
+* [cite_start]**AE Extraction and Structured Data Output**: Extracted texts are processed using the DeepSeek R1 API to identify individual AEs[cite: 89].
+* [cite_start]**MedDRA v28 Enrichment**: Unique AE terms are encoded against MedDRA version 28 using exact string matching and a System Organ Class (SOC)-based filtering strategy with DeepSeek[cite: 93, 97].
 
-### Analysis Capabilities
-- Time-to-detection analysis
-- Pre-market vs. post-market AE comparison
-- System Organ Class (SOC) distribution
-- Therapeutic area correlation analysis
-- Individual drug safety profiles
+## 📈 Analysis Capabilities
+
+The repository includes code to replicate the statistical analyses and figures presented in the manuscript, including:
+
+* [cite_start]Longitudinal growth of the database and temporal trends in safety label updates[cite: 104].
+* [cite_start]Stratification of drug-AEs by discovery phase, specifically pre-marketing versus post-marketing[cite: 105].
+* [cite_start]Quantification of MedDRA SOC coverage and ubiquity across the product population[cite: 106].
+* [cite_start]Density metrics of safety information per medicinal product[cite: 107].
+* [cite_start]Comparative analyses across therapeutic areas using WHO ATC level 1 hierarchy[cite: 109].
+* [cite_start]Mechanism-based safety profile comparisons between small molecules and biological/targeted therapies[cite: 110].
+* [cite_start]Kaplan-Meier survival analysis for time-to-first SmPC update[cite: 111].
 
 ## 💻 Technical Stack
 
-- **Language**: Python 3.12
-- **Platform**: Google Colab
-- **LLM**: DeepSeek AI for text extraction
-- **Key Libraries**: 
-  - pandas (data handling)
-  - openpyxl (Excel operations)
-  - PyPDF2 (PDF processing)
-  - pymysql (database connectivity)
+* [cite_start]**Languages**: Python (version 3.2) and R (version RStudio 2026.01.0)[cite: 71, 112].
+* [cite_start]**Environment**: Google Colab[cite: 71].
+* [cite_start]**AI Models**: DeepSeek R1 for unstructured narrative text parsing and SOC predictions[cite: 52, 97].
+* [cite_start]**Key Python Libraries**: `requests` for web requests[cite: 72].
+* [cite_start]**Key Python Libraries**: `pandas` for structured data manipulation[cite: 72].
+* [cite_start]**Key Python Libraries**: `re` and `json` for parsing embedded web content[cite: 72].
+* [cite_start]**Key Python Libraries**: `pdfplumber`, `PyMuPDF`, `PyPDF2`, and `camelot-py[cv]` for robust text extraction from PDFs[cite: 72, 73].
 
 ## 📊 Data Sources
 
-1. **European Commission Union Register** - Historical SmPC documents up to 15/12/2025
-2. **MedDRA v21** - Medical terminology standardization
+* [cite_start]**European Commission’s Union Register of Medicinal Products**: Sourced with a data lock point on 15 December 2025[cite: 48].
+* [cite_start]**Medical Dictionary for Regulatory Activities (MedDRA)**: Version 28[cite: 53].
 
-## 🤝 Contributing
+## 📄 License and Reproducibility
 
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Submit a pull request
-
-## 📄 License
-
-This project is licensed under [LICENSE TYPE] - see LICENSE file for details.
+[cite_start]The workflow is fully reproducible. [cite_start]All code, package versions, data extraction rules, and transformations are documented in this repository.
 
 ## 📚 Citation
 
-If you use this dataset or methodology in your research, please cite:
+If you use this dataset or methodology in your research, please cite the original article:
+
 ```bibtex
-@misc{bukhari2026dynamic,
-  author = {Bukhari, Syed Tauhid; Kefala, Mary; Sessa, Maurizio},
-  title = {Making a Dynamic Reference Set for Assessing Performance of Traditional and 
-           Artificial Intelligence-based Methods for Signal Detection in Pharmacovigilance},
+@article{kefala2026development,
+  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Powell, Gregory E. and Bate, Andrew and Sessa, Maurizio},
+  title = {Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance},
   year = {2026},
-  institution = {University of Copenhagen}
+  journal = {Original Article}
 }
-```
-
-## 🙏 Acknowledgments
-
-- **Supervisor**: Maurizio Sessa
-- **Institution**: University of Copenhagen
-- **Data Sources**: European Medicines Agency, European Commission
-- **AI Tools**: ChatGPT, Gemini, DeepSeek (for code development)
-
-## 📧 Contact
-
-For questions or collaboration inquiries, please contact:
-- Email: maurizio.sessa.ku.dk
-- Project Lead: Maurizio Sessa
-
-## ⚠️ Disclaimer
-
-This is a research project. The database is intended for methodological research in pharmacovigilance and should not be used as the sole basis for clinical decision-making.
-
----
-
-**Version**: 2.2  
-**Last Updated**: January 23, 2026  
-**Status**: Active Development
