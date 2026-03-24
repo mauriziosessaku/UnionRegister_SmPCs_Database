@@ -62,3 +62,19 @@ If you use this dataset or methodology in your research, please cite the origina
   year = {2026},
   journal = {Original Article}
 }
+
+## 📧 Contact & Support
+
+For questions, issues, or collaboration:
+- **Email**: maurizio.sessa@sund.ku.dk
+- **Corresponding Author**: Maurizio Sessa
+- **Institution**: Department of Drug Design and Pharmacology, University of Copenhagen
+
+## 📚 Related Resources
+
+- **GitHub Repository**: https://github.com/mauriziosessaku/UnionRegister_SmPCs_Database
+- **Methodology**: See full manuscript for detailed methodology.
+
+## ⚠️ Disclaimer
+
+This database is derived from publicly available regulatory documents (SmPCs) published by the European Commission. The data is provided for research purposes only and should not be used as the sole basis for clinical or regulatory decisions. Always refer to official SmPC documents for the most current safety information.
