@@ -1064,3 +1064,412 @@ except ImportError:
 except Exception as e:
     print(f"\n⚠️  Download issue: {e}")
     print(f"   Files are saved in Colab - use file browser to download manually")
+
+
+    
+# ════════════════════════════════════════════════════════════════════════════
+#  CELL 12 ── PIPELINE WALKTHROUGH: 2 worked examples (mock MedDRA)
+#
+#  Paracetamol → Diabetic retinopathy   (Exact Match  / 1-SOC path)
+#  Paracetamol → Hair thinning and loss (SOC-Filtered / 2-SOC path)
+#
+#  Self-contained — no API key or MedDRA files required.
+# ════════════════════════════════════════════════════════════════════════════
+
+import textwrap, re
+from collections import defaultdict
+
+# ── No colour — plain text only ──────────────────────────────────────────────
+R   = ""
+B   = ""
+DIM = ""
+WHITE  = ""
+LBLUE  = ""
+LCYAN  = ""
+LGREEN = ""
+YELLOW = ""
+LRED   = ""
+MGNT   = ""
+GREY   = ""
+BG_NAVY  = ""
+BG_TEAL  = ""
+
+def _vis(s):
+    return len(re.sub(r'\033\[[0-9;]*m', '', s))
+
+def _pad(s, w, align='left'):
+    d = w - _vis(s)
+    return (s + ' '*max(0,d)) if align == 'left' else (' '*max(0,d) + s)
+
+W = 76   # total box width
+
+# ── UI primitives ─────────────────────────────────────────────────────────────
+
+def banner(lines, bg=BG_NAVY):
+    print(f"{bg}{WHITE}{'▀'*W}{R}")
+    for ln in lines:
+        print(f"{bg}{WHITE}  {_pad(ln, W-2)}{R}")
+    print(f"{bg}{WHITE}{'▄'*W}{R}")
+
+def step_banner(n, title, color=LCYAN):
+    num   = f"{BG_TEAL}{WHITE}{B} STEP {n} {R}"
+    ttl   = f"{B}{color} {title}{R}"
+    fill  = W - _vis(num) - _vis(ttl) - 2
+    print(f"\n{num}{ttl}{GREY}{'─'*max(0,fill)}{R}")
+
+def section_rule(label, color=YELLOW):
+    s    = f"  {B}{color}{label}{R}  "
+    vis  = _vis(s)
+    lp   = (W - vis) // 2
+    rp   = W - vis - lp
+    print(f"\n{GREY}{'╌'*lp}{R}{s}{GREY}{'╌'*rp}{R}")
+
+def hbox(rows, title=None, tc=LCYAN):
+    """
+    Bordered box.
+    Each row is either:
+      - ''           → blank line
+      - '---'        → horizontal separator
+      - str          → plain text (auto-wrapped to inner width)
+      - (k,v)        → key│value row  (optionally (k,v,kcol,vcol))
+    """
+    inner = W - 4
+
+    # ── top border ────────────────────────────────────────────────────────
+    if title:
+        ts   = f" {B}{tc}{title}{R} "
+        tv   = _vis(ts)
+        lp   = (W - tv) // 2
+        rp   = W - tv - lp
+        print(f"{GREY}┌{'─'*lp}{R}{ts}{GREY}{'─'*rp}┐{R}")
+    else:
+        print(f"{GREY}┌{'─'*(W-2)}┐{R}")
+
+    for row in rows:
+        # separator
+        if row == '---':
+            print(f"{GREY}├{'─'*(W-2)}┤{R}")
+            continue
+        # blank
+        if row == '':
+            print(f"{GREY}│{' '*(W-2)}│{R}")
+            continue
+        # plain string
+        if isinstance(row, str):
+            for chunk in (textwrap.wrap(row, inner) or ['']):
+                print(f"{GREY}│{R}  {_pad(chunk, inner)}  {GREY}│{R}")
+            continue
+        # key-value tuple
+        k, v       = row[0], row[1]
+        kc         = row[2] if len(row) > 2 else GREY
+        vc         = row[3] if len(row) > 3 else WHITE
+        KW         = 22      # key column visible width
+        ks         = f"{DIM}{kc}{k}{R}"
+        vs         = f"{vc}{v}{R}"
+        gap        = inner - KW - 3
+        kpart      = _pad(ks, KW + len(ks) - _vis(ks), align='right')
+        vpart      = _pad(vs, gap + len(vs) - _vis(vs))
+        print(f"{GREY}│{R}  {kpart}  {GREY}│{R}  {vpart}  {GREY}│{R}")
+
+    print(f"{GREY}└{'─'*(W-2)}┘{R}")
+
+def progress_bar(label, value, maximum, bw=22, lw=38):
+    filled = int(bw * value / maximum) if maximum else 0
+    bar    = f"{LGREEN}{'█'*filled}{GREY}{'░'*(bw-filled)}{R}"
+    pct    = 100 * value / maximum if maximum else 0
+    ls     = f"{GREY}{label}{R}"
+    print(f"  {_pad(ls, lw + len(ls) - _vis(ls))} [{bar}]  "
+          f"{WHITE}{value:>3}{GREY}/{maximum}  {YELLOW}{pct:.0f}%{R}")
+
+# ── Mock MedDRA ───────────────────────────────────────────────────────────────
+MOCK_PT_DICT = {
+    # Eye disorders
+    "DIABETIC RETINOPATHY":  ("10012636","Retinal disorders","Posterior eye disorders","Eye disorders"),
+    "RETINAL HAEMORRHAGE":   ("10038897","Retinal disorders","Posterior eye disorders","Eye disorders"),
+    "MACULAR DEGENERATION":  ("10025421","Retinal disorders","Posterior eye disorders","Eye disorders"),
+    "VISION BLURRED":        ("10047531","Visual acuity reduced","Ocular functional conditions","Eye disorders"),
+    "PHOTOPHOBIA":           ("10034960","Ocular sensory conditions NEC","Ocular sensory conditions","Eye disorders"),
+    # Skin & subcutaneous
+    "ALOPECIA":              ("10001781","Alopecia and hair texture abnormalities","Skin appendage conditions","Skin and subcutaneous tissue disorders"),
+    "ALOPECIA AREATA":       ("10001783","Alopecia and hair texture abnormalities","Skin appendage conditions","Skin and subcutaneous tissue disorders"),
+    "HAIR LOSS ABNORMAL":    ("10018561","Alopecia and hair texture abnormalities","Skin appendage conditions","Skin and subcutaneous tissue disorders"),
+    "RASH":                  ("10037844","Rashes NEC","Epidermal and dermal conditions","Skin and subcutaneous tissue disorders"),
+    "PRURITUS":              ("10037087","Pruritus NEC","Epidermal and dermal conditions","Skin and subcutaneous tissue disorders"),
+    # Endocrine (2nd SOC for scenario B)
+    "HYPOTHYROIDISM":        ("10021114","Thyroid gland disorders","Thyroid gland disorders","Endocrine disorders"),
+    "ADRENAL INSUFFICIENCY": ("10001335","Adrenal gland disorders","Adrenal gland disorders","Endocrine disorders"),
+    "HYPERANDROGENISM":      ("10069382","Androgen related disorders","Sex hormone disorders","Endocrine disorders"),
+    # Irrelevant SOCs — demonstrate filtering power
+    "HEPATITIS":             ("10019717","Hepatitis NEC","Hepatic disorders","Hepatobiliary disorders"),
+    "JAUNDICE":              ("10023126","Cholestasis and jaundice NEC","Hepatic disorders","Hepatobiliary disorders"),
+    "HEADACHE":              ("10019211","Headaches NEC","Headaches","Nervous system disorders"),
+    "DIZZINESS":             ("10013573","Dizziness","Vertigo and labyrinthine disorders","Nervous system disorders"),
+    "PALPITATIONS":          ("10033557","Heart rate and rhythm conditions NEC","Cardiac arrhythmias","Cardiac disorders"),
+    "NAUSEA":                ("10028813","Nausea and vomiting","Gastrointestinal signs and symptoms","Gastrointestinal disorders"),
+}
+
+mock_soc_to_pts = defaultdict(list)
+for pt,(code,hlt,hlgt,soc) in MOCK_PT_DICT.items():
+    mock_soc_to_pts[soc].append(pt)
+ALL_SOCS       = sorted(mock_soc_to_pts.keys())
+TOTAL_PT_SPACE = len(MOCK_PT_DICT)
+
+# ── Pipeline (mirrors real notebook) ─────────────────────────────────────────
+def step1_exact_match(t):   return t.upper().strip() in MOCK_PT_DICT
+
+def step2_soc_prediction(t):
+    return {"Diabetic retinopathy":   ["Eye disorders"],
+            "Hair thinning and loss": ["Skin and subcutaneous tissue disorders",
+                                       "Endocrine disorders"]}.get(t, ALL_SOCS)
+
+def step3_filter_pts(socs):
+    out=[]
+    for s in socs: out.extend(mock_soc_to_pts.get(s,[]))
+    return out
+
+def step4_best_pt(t, cands):
+    best = {"Diabetic retinopathy":"DIABETIC RETINOPATHY",
+            "Hair thinning and loss":"ALOPECIA"}.get(t)
+    return best if (best and best in cands) else (cands[0] if cands else None)
+
+def step5_hierarchy(pt):
+    return MOCK_PT_DICT.get((pt or "").upper())
+
+# ── Multiaxiality demo ────────────────────────────────────────────────────────
+# In the real pipeline the linkage tables are loaded with dict(zip(...)).
+# A dict cannot hold duplicate keys, so when the same PT appears under
+# multiple HLT → HLGT → SOC paths, only the LAST entry in the .asc file
+# survives.  We reproduce that here by deliberately inserting ALOPECIA
+# under a secondary SOC first, then under its primary SOC second — the
+# final dict therefore retains the primary SOC, mirroring the real behaviour.
+
+MULTIAXIAL_RAW = [
+    # (pt_name, pt_code, hlt, hlgt, soc)  — order matters: last entry wins
+    ("ALOPECIA", "10001781", "Alopecia and hair texture abnormalities",
+     "Skin appendage conditions", "Endocrine disorders"),           # secondary  (loaded first)
+    ("ALOPECIA", "10001781", "Alopecia and hair texture abnormalities",
+     "Skin appendage conditions", "Skin and subcutaneous tissue disorders"),  # primary (loaded last → survives)
+]
+
+# Simulate dict(zip(...)) deduplication — last write wins
+pt_to_soc_raw   = {}   # key = pt_name, value = soc
+pt_to_soc_steps = []   # log every write so we can display the overwrite
+for pt_name, code, hlt, hlgt, soc in MULTIAXIAL_RAW:
+    prev = pt_to_soc_raw.get(pt_name)
+    pt_to_soc_raw[pt_name] = soc
+    pt_to_soc_steps.append((pt_name, soc, prev))
+
+# ══════════════════════════════════════════════════════════════════════════════
+EXAMPLES = [
+    {"drug":"Paracetamol","ae":"Diabetic retinopathy",
+     "label":"SCENARIO A  ·  Single-SOC  ·  Exact Match path"},
+    {"drug":"Paracetamol","ae":"Hair thinning and loss",
+     "label":"SCENARIO B  ·  Multi-SOC  ·  SOC-Filtered Match path"},
+]
+
+print()
+banner([
+    f"{B}PIPELINE WALKTHROUGH — MedDRA Mapping{R}{WHITE}",
+    "Two worked examples  ·  Mock MedDRA  ·  DeepSeek V3 (oracle-simulated)",
+    f"{DIM}Mock dictionary: {TOTAL_PT_SPACE} PTs / {len(mock_soc_to_pts)} SOCs"
+    f"    (real pipeline: ~26 000 PTs / 27 SOCs){R}{WHITE}",
+])
+
+for ex in EXAMPLES:
+    drug, ae = ex["drug"], ex["ae"]
+    print()
+    banner([
+        f"{B}{ex['label']}{R}{WHITE}",
+        f"Drug: {B}{drug}{R}{WHITE}   ·   LLM-extracted AE: {B}« {ae} »{R}{WHITE}",
+    ], bg=BG_TEAL)
+
+    # ── STEP 1 ────────────────────────────────────────────────────────────────
+    step_banner(1, "Exact String Match", LCYAN)
+    exact = step1_exact_match(ae)
+    hbox([
+        ("Input term",  ae.upper(), GREY, WHITE),
+        ("Dictionary",  f"{TOTAL_PT_SPACE}-term MedDRA v28 PT list (case-insensitive)", GREY, GREY),
+        "---",
+        ("Result",
+         f"{LGREEN}{B}✔  MATCH FOUND{R}  — assigned as 'Exact Match'" if exact
+         else f"{LRED}{B}✘  No exact match{R}  — proceed to SOC-filtered search",
+         GREY, WHITE),
+        ("Next",
+         f"{LGREEN}Pipeline ends here for this term.{R}" if exact
+         else f"{YELLOW}→  Steps 2 · 3 · 4  required{R}",
+         GREY, WHITE),
+    ])
+
+    if exact:
+        best_pt, result_method, pred_n = ae.upper(), "Exact Match", 1
+    else:
+        # ── STEP 2 ────────────────────────────────────────────────────────────
+        step_banner(2, "LLM Predicts Likely SOC(s)", MGNT)
+        pred_socs = step2_soc_prediction(ae)
+        n_soc     = len(pred_socs)
+        path_tag  = (f"{LGREEN}1-SOC path  →  narrow candidate pool{R}" if n_soc == 1
+                     else f"{YELLOW}Multi-SOC path  →  {n_soc} SOCs  →  broader pool{R}")
+        hbox([
+            ("Input",  f"'{ae}'  +  full list of 27 MedDRA SOCs", GREY, WHITE),
+            ("Output", "  ·  ".join(f"{YELLOW}{s}{R}" for s in pred_socs), GREY, WHITE),
+            ("Path",   path_tag, GREY, WHITE),
+            "---",
+            f"{GREY}⚠  SOC predictions are used {B}only as a search filter{R}{GREY}.{R}",
+            f"{GREY}   They are {B}NOT{R}{GREY} stored as the final SOC annotation.{R}",
+        ], title="LLM — SOC Prediction", tc=MGNT)
+
+        # ── STEP 3 ────────────────────────────────────────────────────────────
+        step_banner(3, "Filter PT Candidate Space", LCYAN)
+        candidates = step3_filter_pts(pred_socs)
+        n_cand     = len(candidates)
+        excluded   = TOTAL_PT_SPACE - n_cand
+
+        print(f"\n  {GREY}Full dictionary:{R}  {B}{WHITE}{TOTAL_PT_SPACE}{R} PTs"
+              f"  across  {B}{WHITE}{len(ALL_SOCS)}{R} SOCs")
+        print(f"  {GREY}Predicted SOC(s):{R}  ",
+              "   ".join(f"{YELLOW}{s}{R}" for s in pred_socs))
+        print()
+        for s in pred_socs:
+            progress_bar(s, len(mock_soc_to_pts[s]), TOTAL_PT_SPACE)
+        print(f"  {GREY}{'─'*60}{R}")
+        progress_bar("COMBINED CANDIDATE POOL", n_cand, TOTAL_PT_SPACE)
+        print()
+
+        hbox(
+            [f"  {LGREEN}+{R}  {WHITE}{pt}{R}" for pt in candidates]
+            + [f"  {LRED}−{R}  {GREY}[{excluded} terms from "
+               f"{len(ALL_SOCS)-len(pred_socs)} other SOCs excluded]{R}",
+               "",
+               f"{YELLOW}{B}Search space: {TOTAL_PT_SPACE} → {n_cand} PTs  "
+               f"({100*(1-n_cand/TOTAL_PT_SPACE):.0f}% reduction){R}"],
+            title="Candidate PT Pool after SOC Filtering", tc=LCYAN)
+
+        # ── STEP 4 ────────────────────────────────────────────────────────────
+        step_banner(4, "LLM Selects Single Best-Matching PT", MGNT)
+        best_pt   = step4_best_pt(ae, candidates)
+        near_note = (f"{LGREEN}Exact string in candidates{R}" if ae.upper() in candidates
+                     else f"{YELLOW}Near-match:  '{ae}'  →  '{best_pt}'{R}")
+        hbox([
+            ("Input",      f"'{ae}'  +  {n_cand} filtered candidates", GREY, WHITE),
+            ("LLM picks",  f"'{best_pt}'", GREY, LGREEN),
+            ("Match type", near_note,      GREY, WHITE),
+            ("Validation", f"'{best_pt}' found in PT dictionary  {LGREEN}✔  OK{R}", GREY, WHITE),
+            ("Method flag", f"{LCYAN}SOC-Filtered Match{R}", GREY, WHITE),
+            "---",
+            f"{GREY}If the LLM returns a non-existent PT name, the code attempts a fuzzy{R}",
+            f"{GREY}lookup. Persistent failures are flagged {LRED}'No Match'{R}{GREY} for manual{R}",
+            f"{GREY}review — they are {B}never silently dropped{R}{GREY}.{R}",
+        ], title="LLM — Best-PT Selection", tc=MGNT)
+
+        result_method, pred_n = "SOC-Filtered Match", n_soc
+
+    # ── STEP 5 ────────────────────────────────────────────────────────────────
+    step_banner(5, "Resolve Full MedDRA Hierarchy  (deterministic — no LLM)", LGREEN)
+    pt_code, hlt, hlgt, final_soc = step5_hierarchy(best_pt)
+
+    # ── Show multiaxiality resolution for Alopecia scenario only ─────────────
+    if best_pt == "ALOPECIA":
+        section_rule("MedDRA MULTIAXIALITY — how SOC is resolved by dict construction", YELLOW)
+        print()
+        print(f"  {GREY}ALOPECIA belongs to {YELLOW}{B}2 SOCs{R}{GREY} in MedDRA (multi-axial).{R}")
+        print(f"  {GREY}The pipeline loads linkage tables with {LCYAN}dict(zip(...)){R}"
+              f"{GREY} — last entry wins:{R}")
+        print()
+        for i, (pt_name, soc, prev) in enumerate(pt_to_soc_steps):
+            order = f"{GREY}entry {i+1}{R}"
+            if prev is None:
+                status = f"{YELLOW}written   →  pt_to_soc['{pt_name}'] = '{soc}'{R}"
+            else:
+                status = (f"{LRED}overwrite{R}  →  "
+                          f"{GREY}'{prev}'{R} {LRED}discarded{R}  "
+                          f"{LGREEN}'{soc}' retained{R}")
+            print(f"  {order}  {status}")
+        print()
+        print(f"  {GREY}Result: the surviving entry is whichever SOC appears {B}last{R}"
+              f"{GREY} in the .asc file.{R}")
+        print(f"  {YELLOW}⚠  This is implicit — the code does not read a 'primary SOC' flag.{R}")
+        print(f"  {YELLOW}   It relies on MedDRA file ordering being stable across versions.{R}")
+        print()
+
+    hbox([
+        ("Confirmed PT", f"{B}{best_pt.title()}{R}  {GREY}(code: {pt_code}){R}", GREY, WHITE),
+        "",
+        f"  {LCYAN}{B}PT{R}    ──▶   {WHITE}{best_pt.title()}{R}",
+        f"  {LCYAN}{B}HLT{R}   ──▶   {WHITE}{hlt}{R}",
+        f"  {LCYAN}{B}HLGT{R}  ──▶   {WHITE}{hlgt}{R}",
+        f"  {LGREEN}{B}SOC{R}   ──▶   {LGREEN}{B}{final_soc}{R}"
+        f"   {DIM}◄── FINAL  (last-loaded linkage entry){R}",
+        "",
+        "---",
+        f"{GREY}Traversal uses MedDRA ASCII linkage tables — no LLM at this stage.{R}",
+        "",
+        f"{B}Key point:{R}  Even though {YELLOW}{B}{pred_n}{R} SOC(s) were used as a filter,",
+        f"exactly {LGREEN}{B}ONE{R} SOC is written to the final record.",
+        f"It is the last-loaded linkage entry for this PT in the .asc files,",
+        f"not an explicit primary-SOC lookup. Secondary memberships are discarded.",
+    ], title="Hierarchy Traversal  PT → HLT → HLGT → SOC", tc=LGREEN)
+
+    # ── Output record ─────────────────────────────────────────────────────────
+    section_rule("OUTPUT ROW  —  written to Excel dataset", YELLOW)
+    print()
+    hbox([
+        ("Drug",               drug,                      GREY, WHITE),
+        ("LLM_extracted_AE",   ae,                        GREY, YELLOW),
+        ("MedDRA_PT_Term",     best_pt.title(),            GREY, WHITE),
+        ("MedDRA_PT_Code",     pt_code,                    GREY, GREY),
+        ("MedDRA_HLT_Term",    hlt,                        GREY, GREY),
+        ("MedDRA_HLGT_Term",   hlgt,                       GREY, GREY),
+        ("MedDRA_SOC_Term",    final_soc,                  GREY, LGREEN+B),
+        ("MedDRA_Match_Method",result_method,              GREY, LCYAN),
+    ])
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SIDE-BY-SIDE COMPARISON
+# ══════════════════════════════════════════════════════════════════════════════
+print()
+banner([f"{B}SIDE-BY-SIDE COMPARISON{R}{WHITE}"])
+
+n_cands_b = len(step3_filter_pts(step2_soc_prediction("Hair thinning and loss")))
+CW = 28
+rows_cmp = [
+    ("Aspect",                   f"{LCYAN}{B}Scenario A{R}",         f"{YELLOW}{B}Scenario B{R}"),
+    ("─"*26,                     "─"*26,                             "─"*26),
+    ("LLM extracted term",       "Diabetic retinopathy",             "Hair thinning and loss"),
+    ("Step 1 exact match",       f"{LGREEN}YES  → stops here{R}",   f"{LRED}NO   → continues{R}"),
+    ("LLM calls (total)",        "1  (extraction only)",             "3  (extract + SOC + PT)"),
+    ("SOCs predicted",           f"{GREY}N/A{R}",                    f"{YELLOW}2  (Skin + Endocrine){R}"),
+    ("Candidate PT pool",        f"{GREY}N/A  (full dict){R}",       f"{YELLOW}{n_cands_b} / {TOTAL_PT_SPACE} PTs  (58% ↓){R}"),
+    ("PT assigned",              "Diabetic Retinopathy",             "Alopecia"),
+    ("Final SOC",                "Eye disorders",                    "Skin and subcut. disorders"),
+    ("Match method",             f"{LCYAN}Exact Match{R}",          f"{LCYAN}SOC-Filtered Match{R}"),
+    ("SOCs in final record",     f"{LGREEN}{B}1{R}",                f"{LGREEN}{B}1{R}"),
+]
+print()
+for label, a, b in rows_cmp:
+    lw = max(28, _vis(label))
+    print(f"  {_pad(label, lw)}  {_pad(a, CW + len(a) - _vis(a))}  {b}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  KEY TAKE-AWAYS
+# ══════════════════════════════════════════════════════════════════════════════
+print()
+banner([f"{B}KEY TAKE-AWAYS{R}{WHITE}"])
+print()
+
+takeaways = [
+    (LCYAN,  "1", "SOC prediction (Step 2) is a search heuristic only.",
+                  "It does NOT determine the final SOC annotation."),
+    (LGREEN, "2", "Regardless of how many SOCs the LLM predicts, the final record",
+                  f"always carries exactly {B}ONE{R} primary SOC — set by the MedDRA hierarchy."),
+    (YELLOW, "3", "Near-matches (e.g. 'Hair thinning and loss' → 'Alopecia') are resolved",
+                  f"by Step 4 but introduce semantic ambiguity.  Flag via {LCYAN}MedDRA_Match_Method{R}."),
+    (MGNT,   "4", f"Scenario A: {LGREEN}faster{R} (1 LLM call), unambiguous.",
+                  f"Scenario B: {YELLOW}slower{R} (3 LLM calls), higher mapping uncertainty."),
+]
+for color, n, *lines in takeaways:
+    print(f"  {BG_TEAL}{WHITE}{B} {n} {R}  {B}{color}{lines[0]}{R}")
+    for ln in lines[1:]:
+        print(f"       {ln}")
+    print()
+
+print(f"{DIM}  Walkthrough complete.{R}\n")
