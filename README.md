@@ -57,7 +57,7 @@ If you use this dataset or methodology in your research, please cite the origina
 
 ```bibtex
 @article{kefala2026development,
-  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Sessa, Maurizio},
+  author = {Kefala, Maria and Painter, Jeffery L. and Bukhari, Syed Tauhid and Sessa, Maurizio},
   title = {Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance},
   year = {2026},
   journal = {Original Article}
