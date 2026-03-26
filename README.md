@@ -4,7 +4,7 @@ A comprehensive system for extracting and analyzing adverse events from European
 
 ## 📋 Overview
 
-This project addresses a critical gap in pharmacovigilance research by developing a time-indexed reference dataset for the European Union (EU). The database includes 17,761 SmPC versions spanning from 1995 to 2025, comprising 123,868 drug–adverse event (AE) associations. The processed database for active centrally authorized products (CAPs) includes 1,479 medicinal products and 110,548 drug-event associations.
+This project addresses a critical gap in pharmacovigilance research by developing a time-indexed reference dataset for the European Union (EU). The database includes 17,763 SmPC versions spanning from 1995 to 2025, comprising 125,026 drug–adverse event (AE) associations. The processed database for active centrally authorized products (CAPs) includes 1,479 medicinal products and 110,548 drug-event associations.
 
 ## 🎯 Motivation
 
@@ -57,7 +57,7 @@ If you use this dataset or methodology in your research, please cite the origina
 
 ```bibtex
 @article{kefala2026development,
-  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Powell, Gregory E. and Bate, Andrew and Sessa, Maurizio},
+  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Sessa, Maurizio},
   title = {Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance},
   year = {2026},
   journal = {Original Article}
