@@ -215,7 +215,7 @@ If you use this database in your research, please cite:
 
 ```bibtex
 @article{kefala2026development,
-  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Powell, and Sessa, Maurizio},
+  author = {Kefala, Maria and Painter, Jeffery L. and Bukhari, Syed Tauhid and Powell, and Sessa, Maurizio},
   title = {Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance},
   year = {2026},
   journal = {Original Article}
