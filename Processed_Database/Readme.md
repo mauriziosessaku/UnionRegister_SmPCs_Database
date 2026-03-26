@@ -51,7 +51,7 @@ The Excel file contains a single comprehensive sheet with **36 columns** organiz
 
 **Match Method Distribution**:
 - Exact Match (MedDRA v28 PT dictionary): 73.5%
-- SOC-Filtered Batch Match (DeepSeek R1): 22.2%
+- SOC-Filtered Batch Match (DeepSeek V3): 22.2%
 - No Match/Manual Assignment: 0.5%
 
 ### 4. ATC Classification (Anatomical Therapeutic Chemical)
