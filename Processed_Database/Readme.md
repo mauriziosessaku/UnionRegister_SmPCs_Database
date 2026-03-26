@@ -85,12 +85,12 @@ Complete 5-level WHO ATC hierarchy:
 ## 📈 Data Distribution
 
 ### Top Therapeutic Area (ATC Level 1)
-- **Antineoplastic and immunomodulating agents**: 45,612 associations (44.7% of total dataset)
+- **Antineoplastic and immunomodulating agents**
 
 ### Top 3 System Organ Classes (MedDRA SOC)
-1. **Gastrointestinal disorders**: 11,613 associations (10.9%)
-2. **Skin and subcutaneous tissue disorders**: 9,924 associations (9.0%)
-3. **Nervous system disorders**: 9,901 associations (9.3%)
+1. **Gastrointestinal disorders**: 
+2. **Skin and subcutaneous tissue disorders**: 
+3. **Nervous system disorders**: 
 
 ## 🔍 Use Cases
 
