@@ -20,7 +20,7 @@ This script automates the complete workflow for creating a time-indexed referenc
 1. **Web Scraping** - Generation of the Union Register link list and metadata extraction.
 2. **Downloading** - Fetching current and historical SmPC PDFs.
 3. **Extracting** - Parsing Section 4.8 ("Undesirable effects") robustly.
-4. **LLM Processing** - Identifying unstructured adverse events using DeepSeek R1.
+4. **LLM Processing** - Identifying unstructured adverse events using DeepSeek V3.
 5. **MedDRA Enrichment** - Standardizing terms via MedDRA v28 exact matching and SOC-based filtering.
 6. **Packaging** - Organizing metadata-rich CSV and Excel exports.
 
@@ -29,7 +29,7 @@ This script automates the complete workflow for creating a time-indexed referenc
 * **Automated Web Scraping** - Programmatically retrieves regulatory metadata from EMA HTML webpages using parsed JavaScript variables.
 * **Date Filtering** - Processes specific SmPC updates by regulatory procedure closing dates.
 * **PDF Processing** - Handles diverse PDF formats using robust libraries like `pdfplumber`, `PyMuPDF`, and `PyPDF2`.
-* **LLM Integration** - Uses the DeepSeek R1 API for high-precision parsing of narrative text.
+* **LLM Integration** - Uses the DeepSeek V3 API for high-precision parsing of narrative text.
 * **Quality Control** - Maintains source file identifiers for full traceability and audit trails.
 
 ---
@@ -81,7 +81,7 @@ Execute the sequential stages:
 1.  **Link Generation**: Parses the EU marketing authorization numbers to construct standardized URLs.
 2.  **Metadata Scraping**: Retrieves INN, ATC codes, and approval dates.
 3.  **PDF Extraction**: Targets Section 4.8 searching for "Undesirable effects" or its formatting variations.
-4.  **AE & MedDRA Coding**: Uses DeepSeek R1 and in-memory MedDRA hierarchies for PT and SOC mapping.
+4.  **AE & MedDRA Coding**: Uses DeepSeek V3 and in-memory MedDRA hierarchies for PT and SOC mapping.
 
 ---
 
