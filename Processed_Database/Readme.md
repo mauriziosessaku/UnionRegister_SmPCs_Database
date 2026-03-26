@@ -7,14 +7,14 @@ This folder contains the consolidated, processed database of adverse events extr
 **File**: `Processed_database.xlsx`
 
 ### Key Statistics
-- **Total Records**: 110,548 drug-adverse event associations
+- **Total Records**: 110,823 drug-adverse event associations
 - **Unique Drugs**: 1,479 active centrally authorized products (CAPs)
 - **Date Range**: October 26, 1995 - December 15, 2025 (30 years)
 - **Geographic Coverage**: EU centrally authorized products
 
 ### Data Composition
-- **Clinical Trial Data** (Baseline/Pre-marketing): 82,526 records (74.7%)
-- **Post-Approval Discovery** (Post-marketing): 28,002 records (25.3%)
+- **Clinical Trial Data** (Baseline/Pre-marketing): 82,534 records (74.5%)
+- **Post-Approval Discovery** (Post-marketing): 28,289 records (25.5%)
 
 ## 📁 File Structure
 
@@ -176,9 +176,9 @@ This processed database was created through the following pipeline:
 ```text
 European Commission's Union Register of Medicinal Products
     ↓
-SmPC PDFs (1,513 CAPs × 17,761 versions)
+SmPC PDFs (1,513 CAPs)
     ↓
-LLM Extraction (DeepSeek R1) → Section 4.8 Adverse Events
+LLM Extraction (DeepSeek V3) → Section 4.8 Adverse Events
     ↓
 MedDRA Mapping v28 (Exact String Match & SOC-Filtered Batch Match)
     ↓
@@ -190,7 +190,7 @@ Processed_database.xlsx (This file)
 ## 📋 Data Quality
 
 ### Extraction Accuracy
-- **LLM Extraction**: 92% accuracy (validated manually by MK and STB on the latest SmPCs)
+- **LLM Extraction**: 95.1% accuracy (validated manually by MK and STB on the latest SmPCs)
 - **MedDRA Mapping**: 95.7% overall success rate (73.5% exact, 22.2% SOC-filtered)
 
 ### Known Limitations
@@ -215,7 +215,7 @@ If you use this database in your research, please cite:
 
 ```bibtex
 @article{kefala2026development,
-  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Powell, Gregory E. and Bate, Andrew and Sessa, Maurizio},
+  author = {Kefala, Maria and Painter, Jeffrey L. and Bukhari, Syed Tauhid and Powell, and Sessa, Maurizio},
   title = {Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance},
   year = {2026},
   journal = {Original Article}
