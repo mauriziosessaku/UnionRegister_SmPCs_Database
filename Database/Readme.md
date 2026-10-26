@@ -24,7 +24,7 @@ data/
 │   ├── Latest/
 │   └── Updates/
 ...
-└── [1,514 total drug folders]
+└── [1,513 centrally authorised products in the historical manuscript cohort]
 ```
 
 ## Alternative: Direct Download via Command Line
