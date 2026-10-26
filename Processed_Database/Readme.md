@@ -190,8 +190,8 @@ Processed_database.xlsx (This file)
 ## 📋 Data Quality
 
 ### Extraction Accuracy
-- **LLM Extraction**: 95.1% accuracy (validated manually by MK and STB on the latest SmPCs)
-- **MedDRA Mapping**: 95.7% overall success rate (73.5% exact, 22.2% SOC-filtered)
+- **LLM Extraction**: 95.1% accuracy as reported in the revised manuscript; manual validation by MK and STB covered the latest SmPC versions and should not be interpreted as item-by-item validation of all historical records.
+- **MedDRA Mapping**: 95.7% reported overall mapping success (73.5% exact, 22.2% SOC-filtered). These reported rates should not be interpreted as proof of semantic correctness for all mapped terms. The existing pipeline assigns one SOC to multi-axial PTs via dictionary loading order, rather than a formally selected primary SOC.
 
 ### Known Limitations
 - **Coverage**: Only EU centrally authorized products (CAPs); nationally authorized products are not included.
