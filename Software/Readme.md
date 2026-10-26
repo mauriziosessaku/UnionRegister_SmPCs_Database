@@ -41,7 +41,7 @@ This script automates the complete workflow for creating a time-indexed referenc
 * Internet connection for EMA data access.
 
 ### Python Packages
-The pipeline is designed for **Python (version 3.2)**. The script automatically installs required packages:
+The pipeline is designed for **Python (Google Colab; record the runtime and package versions used for each execution)**. The script automatically installs required packages:
 * `requests` - Automated web requests.
 * `pandas` - Structured data manipulation.
 * `pdfplumber`, `PyMuPDF`, `PyPDF2`, `camelot-py[cv]` - Robust PDF text and table extraction.
@@ -88,7 +88,7 @@ Execute the sequential stages:
 ## 🔍 Quality Control Features & Metrics
 
 ### 1. Extraction Accuracy
-Manual validation by two independent researchers on 1,513 active products demonstrated a 92% extraction accuracy using the DeepSeek model.
+Manual validation of extracted information from the latest SmPC versions by two researchers (MK and STB) is reported in the revised manuscript, with 95.1% AE extraction accuracy. The historical collection contains 1,513 CAPs; the processed dataset contains 1,479 active CAPs.
 
 ### 2. MedDRA Mapping Integrity
 The two-pass coding strategy (exact string matching + SOC-filtered batch matching via DeepSeek) achieves an overall success rate of 95.7%.
@@ -100,7 +100,7 @@ Timestamps and standardized filenames (including original source file IDs) ensur
 
 ## ⚠️ Known Limitations
 
-* **Coverage**: The script is designed exclusively for Centrally Authorised Products (CAPs) and does not cover nationally authorised medicines.
+* **Coverage**: The workflow covers centrally authorised products (1,513 CAPs in the historical collection; 1,479 active CAPs in the processed dataset), excluding nationally authorised medicines.
 * **Temporal Anchoring**: The extraction utilizes the formal SmPC procedure close date, which represents the regulatory approval date rather than the first date of signal identification.
 
 ---
@@ -128,11 +128,11 @@ If you use this pipeline or the resulting dataset in your research, please cite 
 
 * **Repository:** https://github.com/mauriziosessaku/UnionRegister_SmPCs_Database
 
-* **Last Updated:** March 2026
+* **Manuscript reference:** revised CTS-2026-0457-T (data lock: 15 December 2025)
 
-* **Tested On:** Google Colab (Python 3.2)
+* **Execution environment:** Google Colab; verify the exact Python runtime version before reproducing the analysis
 
 * **Status:** Production Ready ✅
 
 
-*(System Required Citations: The pipeline achieves a 92% extraction accuracy and a 95.7% overall success rate for MedDRA mapping. The validation was conducted on 1,513 products.)*
+*According to the revised manuscript, AE extraction accuracy was 95.1% and MedDRA mapping success was 95.7%. Manual validation addressed the latest SmPC versions; these metrics should not be generalized to independently validated historical versions without additional evidence.*
