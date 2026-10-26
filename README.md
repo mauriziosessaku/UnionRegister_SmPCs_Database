@@ -1,81 +1,67 @@
-# Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance
+# European Union time-indexed reference dataset for pharmacovigilance signal detection
 
-A comprehensive system for extracting and analyzing adverse events from European Union Summary of Product Characteristics (SmPC) documents to create a dynamic, time-indexed reference dataset for benchmarking signal detection methods in pharmacovigilance.
+This repository accompanies the manuscript **“Development of a European Union Time-Indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance using a Large Language Model”** (Kefala, Painter, Bukhari, and Sessa; manuscript under revision at *Clinical and Translational Science*).
 
-## 📋 Overview
+It provides an EU-focused, time-indexed reference dataset of adverse events (AEs) first reported in the Summary of Product Characteristics (SmPC) of centrally authorised products (CAPs), together with extraction, terminology-mapping, and analysis code.
 
-This project addresses a critical gap in pharmacovigilance research by developing a time-indexed reference dataset for the European Union (EU). The database includes 17,763 SmPC versions spanning from 1995 to 2025, comprising 125,026 drug–adverse event (AE) associations. The processed database for active centrally authorized products (CAPs) includes 1,479 medicinal products and 110,548 drug-event associations.
+## Scope and key figures
 
-## 🎯 Motivation
+**Source manuscript:** revised clean version supplied for CTS manuscript **CTS-2026-0457-T**. **Data lock:** 15 December 2025. The values below refer to two different dataset scopes and should not be interchanged.
 
-The identification of optimal signal detection methods is hindered by the lack of reliable reference datasets. Existing datasets do not capture when adverse events (AEs) are officially recognized by regulatory authorities. This limitation prevents the restriction of analyses to pre-confirmation periods and limits the evaluation of early detection performance. 
+| Measure | Complete historical database | Processed time-indexed reference dataset |
+| --- | ---: | ---: |
+| Centrally authorised products | 1,513 CAPs | 1,479 active CAPs |
+| Drug–AE associations | 125,026 | 110,823 |
+| SmPC versions | 17,763, across the historical collection | Derived from the historical SmPC collection |
+| Observation period | 26 October 1995 – 15 December 2025 | Same historical source period |
 
-## 🚀 Methodology and Features
+In the **processed dataset**, 82,534 drug–AE associations (74.5%) were classified as **baseline/pre-marketing**, and 28,289 (25.5%) as **post-approval discoveries**. Its Excel file contains **36 variables** covering product identification, AE information, the MedDRA hierarchy, five-level WHO ATC coding, regulatory metadata, and source traceability.
 
-The data processing workflow consists of sequential and fully automated stages:
+A drug–AE pair's time index is the first identified inclusion in the SmPC, anchored to the available regulatory procedure-closing date. **This is not necessarily the date when a signal was first detected or validated.** The dataset supports research and methodological benchmarking; labelled associations are not a substitute for case-level clinical causality assessment.
 
-* **Generation of the Union Register Link List**: Standardized URLs are constructed for each product to point to dedicated Union Register pages.
-* **Web Scraping and Metadata Extraction**: Product information and regulatory procedure records are programmatically retrieved from EMA public HTML webpages.
-* **PDF Download and Section 4.8 Extraction**: SmPC PDFs are downloaded and the "Undesirable effects" section is extracted using `pdfplumber`.
-* **AE Extraction and Structured Data Output**: Extracted texts are processed using the DeepSeek R1 API to identify individual AEs.
-* **MedDRA v28 Enrichment**: Unique AE terms are encoded against MedDRA version 28 using exact string matching and a System Organ Class (SOC)-based filtering strategy with DeepSeek.
+## Data sources and five-stage workflow
 
-## 📈 Analysis Capabilities
+1. **Product index:** generate a list of EU centrally authorised products using the European Commission Union Register brand index, supplemented with relevant European Medicines Agency (EMA) public product metadata.
+2. **Regulatory metadata:** extract product and regulatory-procedure information from the Union Register and associated public EMA resources (including the relevant webpage metadata).
+3. **SmPC extraction:** retrieve current and historical SmPC PDFs and extract Section 4.8 (“Undesirable effects”) text.
+4. **AE extraction:** use **DeepSeek V3**, accessed through the `deepseek-chat` API endpoint with temperature 0, to identify individual AE expressions and produce structured files.
+5. **MedDRA v28 enrichment:** use case-insensitive exact matching to Preferred Terms (PTs), followed where needed by LLM-guided SOC-filtered matching; attach the PT→HLT→HLGT→SOC hierarchy.
 
-The repository includes code to replicate the statistical analyses and figures presented in the manuscript, including:
+The model used for extraction is **DeepSeek V3**, **not DeepSeek R1**. An article describing DeepSeek-R1 cited in a manuscript bibliography should not be interpreted as the model used by this pipeline.
 
-* Longitudinal growth of the database and temporal trends in safety label updates.
-* Stratification of drug-AEs by discovery phase, specifically pre-marketing versus post-marketing.
-* Quantification of MedDRA SOC coverage and ubiquity across the product population.
-* Density metrics of safety information per medicinal product.
-* Comparative analyses across therapeutic areas using WHO ATC level 1 hierarchy.
-* Mechanism-based safety profile comparisons between small molecules and biological/targeted therapies.
-* Kaplan-Meier survival analysis for time-to-first SmPC update.
+## Validation and terminology mapping
 
-## 💻 Technical Stack
+For the **most recent SmPC versions across the included products**, two researchers (MK and STB) manually checked extracted AEs, drug identification fields, and available regulatory metadata against the source documents and webpages. The manuscript reports **95.1% AE extraction accuracy**. Validation statuses included correct, incorrect, missing, duplicate, and triplicate items. See [Validation_dataset](Validation_dataset/) for the validation materials.
 
-* **Languages**: Python (version 3.2) and R (version RStudio 2026.01.0).
-* **Environment**: Google Colab.
-* **AI Models**: DeepSeek R1 for unstructured narrative text parsing and SOC predictions.
-* **Key Python Libraries**: `requests` for web requests.
-* **Key Python Libraries**: `pandas` for structured data manipulation.
-* **Key Python Libraries**: `re` and `json` for parsing embedded web content.
-* **Key Python Libraries**: `pdfplumber`, `PyMuPDF`, `PyPDF2`, and `camelot-py[cv]` for robust text extraction from PDFs.
+The manuscript reports a **95.7% MedDRA terminology-mapping success rate**, comprising **73.5% exact matches** and **22.2% SOC-filtered matches**. These percentages describe reported mapping outcomes; they do not independently establish the semantic correctness of every individual assigned PT.
 
-## 📊 Data Sources
+**Structural limitation:** the original hierarchy reconstruction retains a single SOC relationship for a multi-axial PT based on dictionary loading order, without explicitly selecting the MedDRA-designated primary SOC. The associated SOC-level summaries should be interpreted with that limitation in mind (see Supplementary Methods S1).
 
-* **European Commission’s Union Register of Medicinal Products**: Sourced with a data lock point on 15 December 2025.
-* **Medical Dictionary for Regulatory Activities (MedDRA)**: Version 28.
+## Repository contents
 
-## 📄 License and Reproducibility
+| Path | Contents |
+| --- | --- |
+| [Database](Database/) | Instructions for accessing the historical extracted SmPC database archive |
+| [Processed_Database/Processed_database.xlsx](Processed_Database/Processed_database.xlsx) | Processed database for 1,479 active CAPs (110,823 drug–AE records) |
+| [Validation_dataset](Validation_dataset/) | Manually reviewed validation materials |
+| [Software/Software.py](Software/Software.py) | Product metadata retrieval, SmPC Section 4.8 extraction, and LLM AE extraction |
+| [Software/soc_filtering_matching.py](Software/soc_filtering_matching.py) | MedDRA v28 terminology mapping |
+| [Software/data_pre_processing.py](Software/data_pre_processing.py) | Product index and preprocessing |
+| [Software/manuscript_analysis.py](Software/manuscript_analysis.py) | Descriptive analyses and figures in the manuscript |
+| [Software/figure_s1_specificity_over_time.py](Software/figure_s1_specificity_over_time.py) | Three-year accrual-adjusted PT specificity analysis |
 
-The workflow is fully reproducible. All code, package versions, data extraction rules, and transformations are documented in this repository.
+The descriptive analyses cover temporal accrual, baseline versus post-marketing additions, regulatory procedures, PT/SOC counts per drug, ATC therapeutic areas, drug-type SOC profiles, and time to first label update. Figure S1 uses a **fixed three-year observation window** for first-appearance PT cohorts through **2022**, limiting right-censoring bias in recent years.
 
-## 📚 Citation
+## Reproducibility and use
 
-If you use this dataset or methodology in your research, please cite the original article:
+The code was developed in a Python/Google Colab workflow. Required dependencies include pandas, requests, and PDF/text-processing libraries. Re-running terminology enrichment requires licensed access to **MedDRA v28 ASCII files**; running live extraction also requires access to the relevant source documents and a DeepSeek API key. The deposited spreadsheet is a snapshot at the stated data lock and is not automatically updated by GitHub.
 
-```bibtex
-@article{kefala2026development,
-  author = {Kefala, Maria and Painter, Jeffery L. and Bukhari, Syed Tauhid and Sessa, Maurizio},
-  title = {Development of a European Union Time-indexed Reference Dataset for Assessing the Performance of Signal Detection Methods in Pharmacovigilance},
-  year = {2026},
-  journal = {Original Article}
-}
-```
+The associated manuscript and Supplementary Methods S1 are the scientific reference for dataset definitions, validation design, and interpretation. When manuscript and an older README disagree, use the **revised manuscript** as the reference and report any remaining discrepancies.
 
-## 📧 Contact & Support
+## Contact
 
-For questions, issues, or collaboration:
-- **Email**: maurizio.sessa@sund.ku.dk
-- **Corresponding Author**: Maurizio Sessa
-- **Institution**: Department of Drug Design and Pharmacology, University of Copenhagen
+**Maurizio Sessa**, Department of Drug Design and Pharmacology, University of Copenhagen — maurizio.sessa@sund.ku.dk
 
-## 📚 Related Resources
+## Disclaimer
 
-- **GitHub Repository**: https://github.com/mauriziosessaku/UnionRegister_SmPCs_Database
-- **Methodology**: See full manuscript for detailed methodology.
-
-## ⚠️ Disclaimer
-
-This database is derived from publicly available regulatory documents (SmPCs) published by the European Commission. The data is provided for research purposes only and should not be used as the sole basis for clinical or regulatory decisions. Always refer to official SmPC documents for the most current safety information.
+This resource is intended for research and methodological evaluation, not as the sole basis for a clinical or regulatory decision. Consult current official SmPCs for up-to-date product safety information.
